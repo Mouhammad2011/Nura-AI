@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nura — Focus · Learn · Glow</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07070d;
+  --bg2:#0e0e1a;
+  --bg3:#151522;
+  --bg4:#1c1c2e;
+  --bg5:#242436;
+  --gold:#c8a84b;
+  --gold2:#e4c96a;
+  --gold3:#f5e0a0;
+  --gold-glow:rgba(200,168,75,0.12);
+  --gold-glow2:rgba(200,168,75,0.06);
+  --text:#f0f0ff;
+  --text2:#8888aa;
+  --text3:#44445a;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(200,168,75,0.2);
+  --cool:#89c4ff;
+  --warm:#ffb060;
+  --calm:#80c8a0;
+  --dim:#9070c0;
+  --r:14px;
+  --r2:20px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow:hidden}
+
+/* grid lines bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(200,168,75,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,0.03) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:0;
+}
+
+.app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto 1fr;height:100vh;position:relative;z-index:1}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:64px;border-bottom:1px solid var(--border);background:rgba(7,7,13,0.9);backdrop-filter:blur(20px)}
+.logo-mark{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:6px;color:var(--gold2);line-height:1}
+.logo-sub{font-size:10px;letter-spacing:4px;color:var(--text3);font-weight:300;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--calm);box-shadow:0 0 8px var(--calm);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.status-text{font-size:12px;color:var(--text2);letter-spacing:1px}
+.session-badge{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold2);background:var(--gold-glow);border:1px solid var(--border2);padding:6px 14px;border-radius:8px;letter-spacing:1px}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:13px 24px;cursor:pointer;transition:all .2s;font-size:13px;font-weight:500;color:var(--text2);letter-spacing:.5px;border-left:2px solid transparent;position:relative}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.nav-item.active{color:var(--gold2);background:var(--gold-glow);border-left-color:var(--gold)}
+.nav-icon{font-size:18px;width:22px;text-align:center}
+.nav-divider{height:1px;background:var(--border);margin:16px 24px}
+.nav-label{font-size:10px;color:var(--text3);letter-spacing:2px;padding:0 24px;margin-bottom:8px;text-transform:uppercase}
+
+.focus-ring{width:100px;height:100px;margin:24px auto;position:relative}
+.ring-svg{width:100%;height:100%}
+.ring-bg{fill:none;stroke:var(--bg4);stroke-width:8}
+.ring-fill{fill:none;stroke:var(--gold);stroke-width:8;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:50;transition:stroke-dashoffset 1s;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold2);line-height:1}
+.ring-lbl{font-size:9px;color:var(--text3);letter-spacing:1.5px;margin-top:2px}
+
+.light-cube{width:60px;height:60px;margin:0 auto 24px;position:relative}
+.cube-face{width:40px;height:40px;border:1.5px solid rgba(200,168,75,0.3);background:var(--bg3);position:absolute;transition:all .6s}
+.cube-face.front{top:10px;left:10px;border-radius:6px}
+.cube-face.top{top:0;left:10px;height:14px;border-radius:4px 4px 0 0;transform:skewX(-20deg)}
+.cube-face.side{top:10px;right:0;width:14px;border-radius:0 4px 4px 0;transform:skewY(-20deg)}
+.cube-glow{position:absolute;inset:-4px;border-radius:8px;opacity:0.4;transition:all .6s;filter:blur(8px)}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg)}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+.section{display:none;padding:28px;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:28px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:var(--text);line-height:1}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px;letter-spacing:.3px}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold)40,transparent)}
+.stat-card:hover{border-color:rgba(200,168,75,0.15)}
+.stat-card.gold{border-color:var(--border2);background:var(--gold-glow2)}
+.stat-card.gold::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.s-label{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.s-value{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--text);line-height:1;letter-spacing:1px}
+.stat-card.gold .s-value{color:var(--gold2)}
+.s-sub{font-size:12px;color:var(--text2);margin-top:6px}
+.s-bar{height:3px;background:var(--bg4);border-radius:100px;margin-top:12px;overflow:hidden}
+.s-bar-fill{height:100%;border-radius:100px;background:var(--gold);transition:width 1s}
+
+/* LIGHT MODE PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold)30,transparent)}
+.panel-title{font-size:10px;color:var(--text3);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px}
+
+.light-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.light-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 12px;cursor:pointer;transition:all .25s;text-align:center}
+.light-btn:hover{border-color:var(--border2)}
+.light-btn.active{border-color:var(--gold);background:var(--gold-glow)}
+.light-orb{width:32px;height:32px;border-radius:50%;margin:0 auto 10px;transition:all .4s}
+.light-btn-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.light-btn-k{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.light-btn.active .light-btn-name{color:var(--gold2)}
+
+.light-bar{border-radius:10px;height:48px;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.5);transition:background .8s;font-family:'JetBrains Mono',monospace}
+
+/* SESSION */
+.session-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.session-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold)30,transparent)}
+.session-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.session-timer{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:4px;color:var(--text);line-height:1}
+.session-controls{display:flex;gap:10px}
+.btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:10px 22px;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s;letter-spacing:.5px}
+.btn:hover{border-color:var(--border2);color:var(--text)}
+.btn.primary{background:var(--gold-glow);border-color:var(--gold);color:var(--gold2)}
+.btn.primary:hover{background:rgba(200,168,75,0.2)}
+.progress-track{height:4px;background:var(--bg4);border-radius:100px;overflow:hidden;margin-bottom:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:100px;transition:width .5s;width:0%}
+.week-wrap{display:flex;flex-direction:column;gap:8px}
+.week-bars{display:flex;gap:8px;align-items:flex-end;height:48px}
+.week-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.wbar{width:100%;border-radius:3px 3px 0 0;background:var(--bg4);min-height:3px;transition:all .3s}
+.wbar.today{background:var(--gold)}
+.week-days{display:flex;gap:8px}
+.wday{flex:1;text-align:center;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.wday.today{color:var(--gold2)}
+
+/* NOTES */
+.notes-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.filter-row{display:flex;gap:8px}
+.filter-chip{font-size:12px;padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.filter-chip:hover{border-color:var(--border2);color:var(--text)}
+.filter-chip.active{border-color:var(--gold);background:var(--gold-glow);color:var(--gold2)}
+.notes-grid{display:flex;flex-direction:column;gap:12px}
+.note-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.note-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);opacity:0;transition:opacity .2s}
+.note-card:hover{border-color:rgba(200,168,75,0.2);transform:translateX(2px)}
+.note-card:hover::before{opacity:1}
+.note-subject-tag{display:inline-block;font-size:10px;letter-spacing:2px;color:var(--gold2);background:var(--gold-glow);border:1px solid var(--border2);padding:3px 10px;border-radius:100px;margin-bottom:10px;text-transform:uppercase}
+.note-q{font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px;line-height:1.4}
+.note-a{font-size:13px;color:var(--text2);line-height:1.6}
+.note-time{font-size:11px;color:var(--text3);margin-top:10px;font-family:'JetBrains Mono',monospace}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:16px;opacity:0.3}
+.empty-text{font-size:14px;line-height:1.6}
+
+/* TUTOR */
+.tutor-wrap{display:flex;flex-direction:column;height:calc(100vh - 64px - 56px - 56px)}
+.tutor-header{margin-bottom:20px}
+.mode-badge{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:1.5px;color:var(--gold2);background:var(--gold-glow);border:1px solid var(--border2);padding:6px 14px;border-radius:100px;margin-bottom:16px}
+.mode-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s infinite}
+.chat-box{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding:4px 2px 20px;min-height:0}
+.chat-box::-webkit-scrollbar{width:3px}
+.chat-box::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+.msg{max-width:78%;animation:msgIn .25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end}
+.msg.ai{align-self:flex-start}
+.msg-bubble{padding:14px 18px;border-radius:16px;font-size:14px;line-height:1.7}
+.msg.user .msg-bubble{background:var(--gold-glow);border:1px solid var(--border2);color:var(--text);border-bottom-right-radius:4px}
+.msg.ai .msg-bubble{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px}
+.msg-sender{font-size:10px;letter-spacing:1.5px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.msg.user .msg-sender{text-align:right;color:var(--gold)80}
+.typing-indicator{display:flex;gap:5px;padding:4px 0;align-items:center}
+.td{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:tdot .9s infinite}
+.td:nth-child(2){animation-delay:.15s}
+.td:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}
+
+.chat-input-area{border-top:1px solid var(--border);padding-top:20px;display:flex;gap:12px;align-items:flex-end}
+.chat-textarea{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:14px 18px;border-radius:14px;outline:none;resize:none;height:52px;max-height:120px;transition:border-color .2s;line-height:1.5}
+.chat-textarea:focus{border-color:rgba(200,168,75,0.35)}
+.chat-textarea::placeholder{color:var(--text3)}
+.ask-btn{background:var(--gold-glow);border:1px solid var(--gold);color:var(--gold2);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:0 24px;height:52px;border-radius:14px;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.5px}
+.ask-btn:hover{background:rgba(200,168,75,0.22)}
+.ask-btn:disabled{opacity:0.35;cursor:not-allowed}
+.hint-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hint{font-size:12px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:6px 14px;border-radius:100px;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.hint:hover{color:var(--text2);border-color:var(--border2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="logo-mark">NURA</div>
+      <div class="logo-sub">focus · learn · glow</div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <div class="status-text">HEADBAND CONNECTED</div>
+      <div class="session-badge" id="top-timer">00:00</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div style="padding:0 24px;margin-bottom:24px">
+      <!-- focus ring -->
+      <div class="focus-ring">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="45"/>
+          <circle class="ring-fill" cx="50" cy="50" r="45" id="ring-arc"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">84</div>
+          <div class="ring-lbl">FOCUS</div>
+        </div>
+      </div>
+      <!-- cube viz -->
+      <div class="light-cube">
+        <div class="cube-glow" id="cube-glow" style="background:var(--calm)"></div>
+        <div class="cube-face top" id="cf-top"></div>
+        <div class="cube-face side" id="cf-side"></div>
+        <div class="cube-face front" id="cf-front"></div>
+      </div>
+    </div>
+
+    <div class="nav-label">Navigation</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)">
+      <span class="nav-icon">⬡</span>Dashboard
+    </div>
+    <div class="nav-item" onclick="nav('notes',this)">
+      <span class="nav-icon">◈</span>Study Notes
+    </div>
+    <div class="nav-item" onclick="nav('tutor',this)">
+      <span class="nav-icon">◎</span>AI Tutor
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-label">Session</div>
+    <div style="padding:0 24px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Today</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold2);letter-spacing:2px" id="sidebar-time">1h 42m</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">studied</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Your study performance at a glance</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card gold">
+          <div class="s-label">Focus Score</div>
+          <div class="s-value">84%</div>
+          <div class="s-sub">↑ 12% above your weekly avg</div>
+          <div class="s-bar"><div class="s-bar-fill" style="width:84%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="s-label">Study Time</div>
+          <div class="s-value">1h 42m</div>
+          <div class="s-sub">Goal: 2h daily</div>
+          <div class="s-bar"><div class="s-bar-fill" style="width:86%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="s-label">Questions Asked</div>
+          <div class="s-value" id="dash-q">3</div>
+          <div class="s-sub">Saved to notes</div>
+          <div class="s-bar"><div class="s-bar-fill" id="q-bar" style="width:30%"></div></div>
+        </div>
+      </div>
+
+      <div class="session-panel">
+        <div class="panel-title">Current Session</div>
+        <div class="session-top">
+          <div>
+            <div class="session-timer" id="main-timer">00:00</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace">ELAPSED TIME</div>
+          </div>
+          <div class="session-controls">
+            <button class="btn primary" id="start-btn" onclick="toggleSession()">Start</button>
+            <button class="btn" onclick="resetSession()">Reset</button>
+          </div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+        <div class="week-wrap">
+          <div class="week-bars" id="week-bars"></div>
+          <div class="week-days" id="week-days"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Cube Light Mode — Science-Based Focus</div>
+        <div class="light-grid">
+          <div class="light-btn" onclick="setLight('cool',this)">
+            <div class="light-orb" style="background:#6ab0ff;box-shadow:0 0 12px #6ab0ff60"></div>
+            <div class="light-btn-name">Deep Focus</div>
+            <div class="light-btn-k">6500K</div>
+          </div>
+          <div class="light-btn active" onclick="setLight('calm',this)">
+            <div class="light-orb" style="background:#80c8a0;box-shadow:0 0 12px #80c8a060"></div>
+            <div class="light-btn-name">Stable Focus</div>
+            <div class="light-btn-k">4500K</div>
+          </div>
+          <div class="light-btn" onclick="setLight('warm',this)">
+            <div class="light-orb" style="background:#ffb060;box-shadow:0 0 12px #ffb06060"></div>
+            <div class="light-btn-name">Break Mode</div>
+            <div class="light-btn-k">3000K</div>
+          </div>
+          <div class="light-btn" onclick="setLight('dim',this)">
+            <div class="light-orb" style="background:#9070c0;box-shadow:0 0 12px #9070c060"></div>
+            <div class="light-btn-name">Calm Down</div>
+            <div class="light-btn-k">2200K</div>
+          </div>
+        </div>
+        <div class="light-bar" id="light-bar" style="background:rgba(128,200,160,0.12);color:rgba(128,200,160,0.7)">
+          STABLE FOCUS MODE ACTIVE — 4500K
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="section" id="notes">
+      <div class="page-header">
+        <div class="page-title">Study Notes</div>
+        <div class="page-sub">Every question you ask Nura is saved here automatically</div>
+      </div>
+      <div class="notes-controls">
+        <div class="filter-row">
+          <div class="filter-chip active" onclick="filterNotes('all',this)">All</div>
+          <div class="filter-chip" onclick="filterNotes('Biology',this)">Biology</div>
+          <div class="filter-chip" onclick="filterNotes('Physics',this)">Physics</div>
+          <div class="filter-chip" onclick="filterNotes('Maths',this)">Maths</div>
+          <div class="filter-chip" onclick="filterNotes('AI Tutor',this)">AI Tutor</div>
+        </div>
+        <button class="btn primary" onclick="nav('tutor',document.querySelectorAll('.nav-item')[2])">+ Ask Nura</button>
+      </div>
+      <div class="notes-grid" id="notes-grid"></div>
+    </div>
+
+    <!-- TUTOR -->
+    <div class="section" id="tutor">
+      <div class="page-header">
+        <div class="page-title">AI Tutor</div>
+        <div class="page-sub">Ask anything — Nura teaches you, never just tells you</div>
+      </div>
+      <div class="tutor-wrap">
+        <div class="mode-badge"><div class="mode-badge-dot"></div>SOCRATIC TEACHING MODE</div>
+        <div class="chat-box" id="chat-box">
+          <div class="msg ai">
+            <div class="msg-sender">Nura</div>
+            <div class="msg-bubble">Hey! I'm your Nura tutor. Ask me anything you're studying — I'll guide you to the answer rather than just giving it to you. That way it actually sticks. What are you working on?</div>
+          </div>
+        </div>
+        <div>
+          <div class="chat-input-area">
+            <textarea class="chat-textarea" id="chat-input" placeholder="Ask me something you're studying..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+            <button class="ask-btn" id="ask-btn" onclick="sendMsg()">Ask Nura</button>
+          </div>
+          <div class="hint-row">
+            <div class="hint" onclick="useHint(this)">Why does mitosis produce identical cells?</div>
+            <div class="hint" onclick="useHint(this)">Explain Newton's 3rd law</div>
+            <div class="hint" onclick="useHint(this)">How does differentiation work?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API_KEY = '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'; // Paste your new Gemini key here
+
+const noteData = [
+  {subject:'Biology',q:'Why does mitosis produce identical cells?',a:'Think about what has to happen to the DNA before a cell can divide. What would go wrong if each daughter cell got a random half of the genetic information?',time:'Today · 14:32'},
+  {subject:'Physics',q:"What is Newton's 3rd law?",a:'Before I explain, think about this: when you push against a wall, does the wall do anything back to you? What do you feel? Start there.',time:'Today · 13:10'},
+  {subject:'Maths',q:'How does differentiation work?',a:"Differentiation is about rate of change. Imagine you're driving — what does the speedometer tell you? How is that related to your position over time?",time:'Yesterday · 16:45'},
+];
+
+let sessionOn=false,secs=0,sessInt=null;
+let chatHistory=[];
+const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const wHeights=[65,80,40,90,55,20,0];
+
+function buildWeek(){
+  const bars=document.getElementById('week-bars');
+  const daysEl=document.getElementById('week-days');
+  bars.innerHTML=days.map((d,i)=>`<div class="week-bar-col"><div class="wbar${i===6?' today':''}" style="height:${Math.max(3,wHeights[i]*0.48)}px"></div></div>`).join('');
+  daysEl.innerHTML=days.map((d,i)=>`<div class="wday${i===6?' today':''}">${d}</div>`).join('');
+}
+buildWeek();
+
+function nav(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+function toggleSession(){
+  sessionOn=!sessionOn;
+  document.getElementById('start-btn').textContent=sessionOn?'Pause':'Resume';
+  if(sessionOn){sessInt=setInterval(tick,1000)}else{clearInterval(sessInt)}
+}
+function resetSession(){
+  clearInterval(sessInt);sessionOn=false;secs=0;
+  document.getElementById('start-btn').textContent='Start';
+  setTimers('00:00');
+  document.getElementById('prog-fill').style.width='0%';
+}
+function tick(){
+  secs++;
+  const m=String(Math.floor(secs/60)).padStart(2,'0');
+  const s=String(secs%60).padStart(2,'0');
+  setTimers(m+':'+s);
+  document.getElementById('prog-fill').style.width=Math.min(100,Math.round((secs/7200)*100))+'%';
+}
+function setTimers(t){
+  document.getElementById('main-timer').textContent=t;
+  document.getElementById('top-timer').textContent=t;
+}
+
+const lightModes={
+  cool:{bg:'rgba(106,176,255,0.12)',text:'rgba(106,176,255,0.75)',label:'DEEP FOCUS MODE ACTIVE — 6500K',glow:'#6ab0ff',cube:'#1a3050'},
+  calm:{bg:'rgba(128,200,160,0.12)',text:'rgba(128,200,160,0.75)',label:'STABLE FOCUS MODE ACTIVE — 4500K',glow:'#80c8a0',cube:'#1a3020'},
+  warm:{bg:'rgba(255,176,96,0.12)',text:'rgba(255,176,96,0.75)',label:'BREAK MODE ACTIVE — 3000K',glow:'#ffb060',cube:'#503010'},
+  dim:{bg:'rgba(144,112,192,0.12)',text:'rgba(144,112,192,0.75)',label:'CALM DOWN MODE ACTIVE — 2200K',glow:'#9070c0',cube:'#201030'},
+};
+function setLight(mode,btn){
+  document.querySelectorAll('.light-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const m=lightModes[mode];
+  const bar=document.getElementById('light-bar');
+  bar.style.background=m.bg;bar.style.color=m.text;bar.textContent=m.label;
+  document.getElementById('cube-glow').style.background=m.glow;
+  ['cf-top','cf-side','cf-front'].forEach(id=>{
+    document.getElementById(id).style.background=m.cube;
+    document.getElementById(id).style.borderColor=m.glow+'60';
+  });
+}
+
+function renderNotes(filter='all'){
+  const grid=document.getElementById('notes-grid');
+  const filtered=filter==='all'?noteData:noteData.filter(n=>n.subject===filter);
+  if(filtered.length===0){
+    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-text">No notes yet for this subject.<br>Ask the AI tutor a question to get started.</div></div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map(n=>`
+    <div class="note-card">
+      <div class="note-subject-tag">${n.subject}</div>
+      <div class="note-q">${n.q}</div>
+      <div class="note-a">${n.a}</div>
+      <div class="note-time">${n.time}</div>
+    </div>`).join('');
+}
+renderNotes();
+
+function filterNotes(f,el){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderNotes(f);
+}
+
+function useHint(el){
+  document.getElementById('chat-input').value=el.textContent;
+  nav('tutor',document.querySelectorAll('.nav-item')[2]);
+}
+
+const chatBox=document.getElementById('chat-box');
+
+async function sendMsg(){
+  const input=document.getElementById('chat-input');
+  const btn=document.getElementById('ask-btn');
+  const text=input.value.trim();
+  if(!text||btn.disabled)return;
+
+  addMsg('user',text);
+  input.value='';
+  btn.disabled=true;
+
+  const typing=document.createElement('div');
+  typing.className='msg ai';
+  typing.innerHTML=`<div class="msg-sender">Nura</div><div class="msg-bubble"><div class="typing-indicator"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  chatBox.appendChild(typing);
+  chatBox.scrollTop=chatBox.scrollHeight;
+
+  chatHistory.push({role:'user',content:text});
+
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:1000,
+        messages:[
+          {role:'system',content:`You are Nura, an AI tutor embedded in a smart study lamp called the Nura Cube, designed for teenagers. Your one strict rule: NEVER give the direct answer to any question. Always use the Socratic method — ask guiding questions, give hints, draw analogies, and help the student reason their way to the answer themselves. Keep responses concise (3-5 sentences max). Tone: warm, encouraging, focused. Do NOT give definitions directly, solve equations, or summarize topics. Always make them think.`},
+          ...chatHistory
+        ]
+      })
+    });
+    const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
+    const reply=data.choices?.[0]?.message?.content||'Got an empty response, try again!';
+    chatBox.removeChild(typing);
+    addMsg('ai',reply);
+    chatHistory.push({role:'assistant',content:reply});
+
+    noteData.unshift({subject:'AI Tutor',q:text,a:reply.slice(0,160)+(reply.length>160?'…':''),time:'Just now'});
+    document.getElementById('dash-q').textContent=noteData.filter(n=>n.subject==='AI Tutor').length;
+    renderNotes(document.querySelector('.filter-chip.active')?.textContent||'all');
+  }catch(e){
+    chatBox.removeChild(typing);
+    addMsg('ai',`Error: ${e.message}. Check your Groq API key.`);
+  }
+  btn.disabled=false;
+  input.focus();
+}
+
+
+function addMsg(role,text){
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  div.innerHTML=`<div class="msg-sender">${role==='user'?'You':'Nura'}</div><div class="msg-bubble">${text}</div>`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+</script>
+</body>
+</html>
